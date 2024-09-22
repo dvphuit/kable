@@ -232,6 +232,7 @@ internal class Callback(
             detail(descriptor)
             detail(event.status)
         }
+
         onResponse.trySendOrLog(event)
     }
 

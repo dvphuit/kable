@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.io.IOException
 import platform.CoreBluetooth.CBCharacteristic
+import platform.CoreBluetooth.CBCharacteristicWriteWithResponse
+import platform.CoreBluetooth.CBCharacteristicWriteWithoutResponse
 import platform.CoreBluetooth.CBDescriptor
 import platform.CoreBluetooth.CBL2CAPChannel
 import platform.CoreBluetooth.CBPeripheral
@@ -45,6 +47,7 @@ internal class PeripheralDelegate(
         data class DidDiscoverServices(
             override val peripheralIdentifier: NSUUID,
             override val error: NSError?,
+            val mtu: Mtu = Mtu()
         ) : Response()
 
         data class DidDiscoverCharacteristicsForService(
@@ -99,7 +102,16 @@ internal class PeripheralDelegate(
             message = "didDiscoverServices"
             detail(didDiscoverServices)
         }
-        _response.sendBlocking(DidDiscoverServices(peripheral.identifier, didDiscoverServices))
+        val mtuForWithoutResp = peripheral.maximumWriteValueLengthForType(CBCharacteristicWriteWithoutResponse)
+        val mtuForResp = peripheral.maximumWriteValueLengthForType(CBCharacteristicWriteWithResponse)
+
+        val mtu = Mtu(
+            forWriteResponse = mtuForResp.toInt(),
+            forWriteNoResponse = mtuForWithoutResp.toInt()
+        )
+
+        println("TEST: mtu ========== $mtu")
+        _response.sendBlocking(DidDiscoverServices(peripheral.identifier, didDiscoverServices, mtu))
     }
 
     @ObjCSignatureOverride

@@ -55,4 +55,9 @@ public actual class PeripheralBuilder internal actual constructor() {
     public actual fun observationExceptionHandler(handler: ObservationExceptionHandler) {
         observationExceptionHandler = handler
     }
+
+    internal var onMtuChanged: OnMtuChanged = {}
+    public actual fun onMtuChanged(handler: OnMtuChanged) {
+        onMtuChanged = handler
+    }
 }

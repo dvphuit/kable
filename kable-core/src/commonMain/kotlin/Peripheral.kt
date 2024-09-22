@@ -283,3 +283,10 @@ internal suspend inline fun <reified T : State> Peripheral.suspendUntilOrThrow()
         .onEach { if (it is State.Disconnected) throw ConnectionLostException() }
         .first { it is T }
 }
+
+
+public data class Mtu (
+    val forWriteResponse: Int = 23,
+    val forWriteNoResponse: Int = 23,
+)
+

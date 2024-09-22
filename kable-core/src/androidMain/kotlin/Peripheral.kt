@@ -36,6 +36,7 @@ public fun CoroutineScope.peripheral(
         builder.threadingStrategy,
         builder.observationExceptionHandler,
         builder.onServicesDiscovered,
+        builder.onMtuChanged,
         builder.logging,
     )
 }

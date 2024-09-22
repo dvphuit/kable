@@ -93,6 +93,7 @@ internal class CBPeripheralCoreBluetoothPeripheral(
     internal val cbPeripheral: CBPeripheral,
     observationExceptionHandler: ObservationExceptionHandler,
     private val onServicesDiscovered: ServicesDiscoveredAction,
+    private val onMtuChanged: OnMtuChanged,
     private val logging: Logging,
 ) : CoreBluetoothPeripheral {
 
@@ -106,6 +107,7 @@ internal class CBPeripheralCoreBluetoothPeripheral(
     override val identifier: Uuid = cbPeripheral.identifier.toUuid()
 
     private val observers = Observers<NSData>(this, logging, exceptionHandler = observationExceptionHandler)
+
 
     /**
      * It's important that we instantiate this scope as late as possible, since [dispose] will be
@@ -276,6 +278,8 @@ internal class CBPeripheralCoreBluetoothPeripheral(
 
         connection.execute<DidDiscoverServices> {
             centralManager.discoverServices(cbPeripheral, servicesToDiscover)
+        }.also {
+            onMtuChanged.invoke(it.mtu)
         }
 
         // Cast should be safe since `CBPeripheral.services` type is `[CBService]?`, according to:
@@ -451,6 +455,7 @@ internal class CBPeripheralCoreBluetoothPeripheral(
         onSubscription: OnSubscriptionAction,
     ): Flow<NSData> = observers.acquire(characteristic, onSubscription)
 
+
     internal suspend fun startNotifications(characteristic: Characteristic) {
         logger.debug {
             message = "CentralManager.notify"
@@ -482,6 +487,7 @@ private fun ConnectionEvent.toState(): State = when (this) {
     is DidConnect -> State.Connecting.Services
     is DidFailToConnect -> State.Disconnected(error?.toStatus())
     is DidDisconnect -> State.Disconnected(error?.toStatus())
+    else -> State.Disconnecting
 }
 
 private fun NSError.toStatus(): State.Disconnected.Status = when (code) {

@@ -31,10 +31,12 @@ public class ObservationExceptionPeripheral internal constructor(peripheral: Per
 
 internal typealias ServicesDiscoveredAction = suspend ServicesDiscoveredPeripheral.() -> Unit
 internal typealias ObservationExceptionHandler = suspend ObservationExceptionPeripheral.(cause: Exception) -> Unit
+internal typealias OnMtuChanged = (Mtu) -> Unit
 
 public expect class PeripheralBuilder internal constructor() {
     public fun logging(init: LoggingBuilder)
     public fun onServicesDiscovered(action: ServicesDiscoveredAction)
+    public fun onMtuChanged(handler: OnMtuChanged)
 
     /**
      * Registers an [ObservationExceptionHandler] for the [Peripheral]. When registered, observation failures are

@@ -67,6 +67,7 @@ internal class BluetoothDeviceAndroidPeripheral(
     private val threadingStrategy: ThreadingStrategy,
     observationExceptionHandler: ObservationExceptionHandler,
     private val onServicesDiscovered: ServicesDiscoveredAction,
+    private val onMtuChanged: OnMtuChanged,
     private val logging: Logging,
 ) : AndroidPeripheral {
 
@@ -259,7 +260,11 @@ internal class BluetoothDeviceAndroidPeripheral(
             message = "requestMtu"
             detail("mtu", mtu)
         }
-        return connection.requestMtu(mtu)
+        return connection.requestMtu(mtu).also {
+            onMtuChanged.invoke(
+                Mtu(forWriteResponse = it, forWriteNoResponse = it)
+            )
+        }
     }
 
     override suspend fun write(

@@ -114,4 +114,11 @@ public actual class PeripheralBuilder internal actual constructor() {
     public var phy: Phy = Phy.Le1M
 
     public var threadingStrategy: ThreadingStrategy = OnDemandThreadingStrategy
+
+
+    internal var onMtuChanged: OnMtuChanged = {}
+
+    public actual fun onMtuChanged(handler: OnMtuChanged) {
+        onMtuChanged = handler
+    }
 }

@@ -23,4 +23,5 @@ public interface CoreBluetoothPeripheral : Peripheral {
 
     @Throws(CancellationException::class, IOException::class, NotReadyException::class)
     public suspend fun readAsNSData(characteristic: Characteristic): NSData
+
 }
